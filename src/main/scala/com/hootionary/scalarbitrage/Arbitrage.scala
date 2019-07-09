@@ -1,5 +1,6 @@
 package com.hootionary.scalarbitrage
 
+import com.hootionary.scalarbitrage.models.Types.CurrencyPriceMap
 import com.hootionary.scalarbitrage.models.{
   Currency,
   CurrencyAmount,
@@ -102,18 +103,9 @@ object Arbitrage {
 
         println(s"    Path: ${cycle.mkString(" -> ")}")
 
-        val pairs = cycle
-          .sliding(2, 1)
-          .map { l =>
-            CurrencyPair(l.head.value, l(1).value)
-          }
-          .toList
+        val pairs = getPairs(cycle.map(c => c.value))
 
-        val conversions =
-          pairs.scanLeft(CurrencyAmount(pairs.head.base, 1.0)) { (ca, pair) =>
-            CurrencyAmount(pair.counter,
-                           ca.amount * currencyPriceMap(pair).price)
-          }
+        val conversions = getConversions(pairs, currencyPriceMap)
         println(s"    Conversions: ${conversions.mkString(" -> ")}")
 
         println()
@@ -127,6 +119,54 @@ object Arbitrage {
 
     println(s"Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
     println()
+
+    bruteForce(currencyPriceMap)
   }
 
+  def bruteForce(currencyPriceMap: CurrencyPriceMap): Unit = {
+    val currencies =
+      currencyPriceMap.keySet.flatMap(cp => List(cp.base, cp.counter))
+
+    val currencyCycles = getCycles(currencies)
+      .map { path =>
+        val conversions = getConversions(getPairs(path), currencyPriceMap)
+        CurrencyCycle(path, conversions.last.amount)
+      }
+      .sortWith(_.multiplier > _.multiplier)
+
+    val cycleStrings = currencyCycles.map(cycle =>
+      f"Multiplier: ${cycle.multiplier}%2.5f, Cycle: ${cycle.path.map(c => c.symbol).mkString(" -> ")}")
+
+    println(
+      s"Brute-Force Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
+  }
+
+  def getCycles(currencies: Set[Currency]): List[List[Currency]] = {
+    currencies.flatMap { currency =>
+      val others = (currencies - currency).toList
+      (1 to others.size)
+        .flatMap(len =>
+          others.combinations(len).toList.flatMap(x => x.permutations))
+        .toSet
+        .map((path: List[Currency]) => (currency :: path) :+ currency)
+    }.toList
+  }
+
+  def getPairs(path: List[Currency]): List[CurrencyPair] = {
+    path
+      .sliding(2, 1)
+      .map { l =>
+        CurrencyPair(l.head, l(1))
+      }
+      .toList
+  }
+
+  def getConversions(
+      pairs: List[CurrencyPair],
+      currencyPriceMap: CurrencyPriceMap): List[CurrencyAmount] = {
+
+    pairs.scanLeft(CurrencyAmount(pairs.head.base, 1.0)) { (ca, pair) =>
+      CurrencyAmount(pair.counter, ca.amount * currencyPriceMap(pair).price)
+    }
+  }
 }

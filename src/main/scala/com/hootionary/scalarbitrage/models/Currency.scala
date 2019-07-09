@@ -1,4 +1,4 @@
-package com.hootionary.scalarbitrage
+package com.hootionary.scalarbitrage.models
 
 case class Currency(symbol: String) {
 

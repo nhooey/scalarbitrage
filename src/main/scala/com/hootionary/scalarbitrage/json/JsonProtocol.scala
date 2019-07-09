@@ -1,7 +1,7 @@
 package com.hootionary.scalarbitrage.json
 
-import com.hootionary.scalarbitrage.{CurrencyPair, CurrencyPrice}
-import com.hootionary.scalarbitrage.Main.CurrencyPriceMap
+import com.hootionary.scalarbitrage.models.{CurrencyPair, CurrencyPrice}
+import com.hootionary.scalarbitrage.models.Types.CurrencyPriceMap
 import spray.json.{
   DefaultJsonProtocol,
   JsNumber,

@@ -1,4 +1,4 @@
-package com.hootionary.scalarbitrage
+package com.hootionary.scalarbitrage.models
 
 final case class CurrencyPair(base: Currency, counter: Currency) {
 

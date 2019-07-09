@@ -88,6 +88,7 @@ object Arbitrage {
         val path = mutable.MutableList[Option[graph.NodeT]]()
         var predecessor = Option(e.to)
 
+        // Could use a Set to save a linear traversal
         while (!(path contains predecessor)) {
           path += predecessor
           predecessor = predecessor match {
@@ -117,12 +118,14 @@ object Arbitrage {
     val cycleStrings = sortedCycles.map(cycle =>
       f"Multiplier: ${cycle.multiplier}%2.5f, Cycle: ${cycle.path.map(c => c.symbol).mkString(" -> ")}")
 
-    println(s"Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
+    println(
+      s"Bellman-Ford Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
     println()
 
     bruteForce(currencyPriceMap)
   }
 
+  /** Calculates the solution with brute force */
   def bruteForce(currencyPriceMap: CurrencyPriceMap): Unit = {
     val currencies =
       currencyPriceMap.keySet.flatMap(cp => List(cp.base, cp.counter))
@@ -141,6 +144,7 @@ object Arbitrage {
       s"Brute-Force Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
   }
 
+  /** Gets all cycles given a set of currencies */
   def getCycles(currencies: Set[Currency]): List[List[Currency]] = {
     currencies.flatMap { currency =>
       val others = (currencies - currency).toList
@@ -152,6 +156,7 @@ object Arbitrage {
     }.toList
   }
 
+  /** Gets a list of adjacent pairs with a sliding window */
   def getPairs(path: List[Currency]): List[CurrencyPair] = {
     path
       .sliding(2, 1)
@@ -161,6 +166,7 @@ object Arbitrage {
       .toList
   }
 
+  /** Converts currencies through path and retains the intermediate solutions */
   def getConversions(
       pairs: List[CurrencyPair],
       currencyPriceMap: CurrencyPriceMap): List[CurrencyAmount] = {

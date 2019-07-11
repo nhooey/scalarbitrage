@@ -141,7 +141,9 @@ object Arbitrage extends App {
       f"Multiplier: ${cycle.multiplier}%2.5f, Cycle: ${cycle.path.map(c => c.symbol).mkString(" -> ")}")
 
     println(
-      s"Brute-Force Arbitrage Opportunities:\n    ${cycleStrings.mkString("\n    ")}")
+      s"Brute-Force Arbitrage Opportunities:\n    ${cycleStrings.slice(0, 4).mkString("\n    ")}")
+
+    println()
   }
 
   /** Gets all cycles given a set of currencies */

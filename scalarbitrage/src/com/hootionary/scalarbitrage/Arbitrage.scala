@@ -21,9 +21,9 @@ import scala.collection.mutable
   The total complexity of the algorithm is O(vertices * edges) due to the repeated relaxation of
   every edge for the amount of vertices that exist in the graph.
  */
-object Arbitrage {
+object Arbitrage extends App {
 
-  def main(args: Array[String]): Unit = {
+  override def main(args: Array[String]): Unit = {
 
     val currencyPriceMap = PriceService.getPrices()
 

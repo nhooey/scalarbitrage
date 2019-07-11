@@ -1,3 +1,15 @@
+# Setup
+
+This project builds with Mill, a replacement for SBT. It can be installed with Homebrew on Mac.
+
+# Building
+
+```
+mill scalarbitrage.compile
+```
+
 # Running
 
-Run `sbt run` to run the program.
+````
+mill scalarbitrage.run
+```
